@@ -14,7 +14,7 @@ type LocalTransport struct {
 }
 
 // create a new local transport
-func NewLocalTransport(addr NetAddr) *LocalTransport {
+func NewLocalTransport(addr NetAddr) Transport {
 	return &LocalTransport{
 		addr:      addr,                              // address of the local transport
 		consumeCh: make(chan RPC, 1024),              // channel to consume messages from
@@ -28,11 +28,11 @@ func (t *LocalTransport) Consume() <-chan RPC {
 }
 
 // connects to a remote transport
-func (t *LocalTransport) Connect(tr *LocalTransport) error {
+func (t *LocalTransport) Connect(tr Transport) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	t.peers[tr.Addr()] = tr
+	t.peers[tr.Addr()] = tr.(*LocalTransport)
 
 	return nil
 }
